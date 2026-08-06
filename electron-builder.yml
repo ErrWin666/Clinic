@@ -1,0 +1,70 @@
+appId: com.clinic.eyeapp
+productName: Clinic Eye
+copyright: Copyright © 2026
+
+directories:
+  output: release
+  buildResources: build
+
+win:
+  target:
+    - nsis
+  icon: build/icon.ico
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: false
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Clinic Eye
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+
+publish:
+  provider: github
+  owner: ErrWin666
+  repo: Clinic
+  releaseType: release
+
+asar: true
+
+files:
+  - main.js
+  - preload.js
+  - backend-manager.js
+  - updater.js
+  - backup.js
+  - system-info.js
+  - data-path-utils.js
+  - data-migrator.js
+  - splash.html
+  - error-screen.html
+  - backend/src/**/*
+  - backend/package.json
+  - frontend/dist/**/*
+  - "!**/tests/**"
+  - "!**/*.test.js"
+  - "!**/*.spec.ts"
+  - "!**/.eslintrc*"
+  - "!**/README.md"
+  - "!**/coverage/**"
+
+extraResources:
+  - from: backend/node_modules
+    to: backend/node_modules
+    filter:
+      - "**/*"
+      - "!**/.bin/**"
+      - "!**/.cache/**"
+      - "!**/*.md"
+      - "!**/*.map"
+      - "!**/*.d.ts"
+      - "!**/test/**"
+      - "!**/tests/**"
+
+asarUnpack:
+  - backend/src/**/*
+  - node_modules/sqlite3/**/*
+  - node_modules/electron-log/**/*
+  - node_modules/electron-updater/**/*

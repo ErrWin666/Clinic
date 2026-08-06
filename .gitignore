@@ -1,0 +1,55 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+release/
+build_log.txt
+
+# Electron builder cache
+.electron-builder-cache/
+
+# Database & runtime data
+database.sqlite
+database.sqlite-wal
+database.sqlite-shm
+backend/database.sqlite
+backend/database.sqlite-wal
+backend/database.sqlite-shm
+backend/uploads/
+backend/backups/
+backend/logs/
+backend/data/
+backend/coverage/
+backend/.tmp/
+backend/test-uploads-1/
+
+# Environment files (keep .env.example)
+.env
+.env.local
+.env.*.local
+frontend/.env
+
+# Test output
+vitest-output.txt
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE & AI tools
+.vscode/
+.idea/
+.qodo/
+.agents/
+.devin/
+.windsurf/
+.husky/
+skills-lock.json
+
+# Documentation (user requested exclusion)
+docs/
+frontend/docs/
+README.md
+frontend/README.md

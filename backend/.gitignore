@@ -1,0 +1,16 @@
+node_modules/
+.env
+database.sqlite
+database.sqlite-wal
+database.sqlite-shm
+uploads/
+backups/
+logs/
+coverage/
+data/
+
+# Temporary files (moved cleanup artifacts)
+.tmp/
+
+# TestSprite external tool output
+testsprite_tests/

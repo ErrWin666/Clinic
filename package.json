@@ -1,0 +1,28 @@
+{
+  "name": "clinic-eye-app",
+  "version": "1.2.0",
+  "description": "Clinic Eye Examination Management Desktop App",
+  "main": "main.js",
+  "scripts": {
+    "dev": "concurrently \"npm:dev:backend\" \"npm:dev:frontend\" \"npm:dev:electron\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:electron": "wait-on http://localhost:5173 && electron .",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm prune --production",
+    "build:win": "npm run build:frontend && npm run build:backend && electron-builder --win --publish never",
+    "build:mac": "npm run build:frontend && npm run build:backend && electron-builder --mac --publish never",
+    "release": "npm run build:frontend && npm run build:backend && electron-builder --win --publish always",
+    "release:draft": "npm run build:frontend && npm run build:backend && electron-builder --win --publish onTagOrDraft"
+  },
+  "dependencies": {
+    "electron-log": "^5.1.0",
+    "electron-updater": "^6.2.1"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3",
+    "wait-on": "^7.2.0"
+  }
+}

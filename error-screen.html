@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      padding: 32px;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #fef2f2;
+      color: #991b1b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .icon { font-size: 48px; margin-bottom: 16px; }
+    .title { font-size: 20px; font-weight: 600; margin-bottom: 12px; }
+    .message {
+      font-size: 14px;
+      text-align: center;
+      max-width: 400px;
+      line-height: 1.6;
+      color: #7f1d1d;
+      margin-bottom: 16px;
+    }
+    .details {
+      max-width: 400px;
+      width: 100%;
+      margin-bottom: 24px;
+    }
+    .details summary {
+      cursor: pointer;
+      font-size: 12px;
+      color: #9f1239;
+      text-align: center;
+    }
+    .details pre {
+      margin-top: 8px;
+      padding: 12px;
+      background: #fee2e2;
+      border-radius: 8px;
+      font-size: 11px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+    .actions { display: flex; gap: 12px; }
+    button {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    .retry { background: #dc2626; color: white; }
+    .retry:hover { background: #b91c1c; }
+    .support { background: #f3f4f6; color: #374151; }
+    .support:hover { background: #e5e7eb; }
+    .reset { background: #f59e0b; color: white; display: none; }
+    .reset:hover { background: #d97706; }
+  </style>
+</head>
+<body>
+  <div class="icon">⚠️</div>
+  <div class="title">Application Error</div>
+  <div class="message" id="error-message">An unexpected error occurred while starting the application.</div>
+  <details class="details">
+    <summary>Error details</summary>
+    <pre id="error-details-text">No details available</pre>
+  </details>
+  <div class="actions">
+    <button class="retry" onclick="window.location.reload()">Retry</button>
+    <button class="reset" id="reset-btn" onclick="resetDataPath()">Reset to Default</button>
+    <button class="support" onclick="require('electron').shell.openExternal('https://support.clinic.app')">Contact Support</button>
+  </div>
+  <script>
+    const { ipcRenderer } = require('electron');
+    ipcRenderer.on('error-details', (_, message) => {
+      document.getElementById('error-details-text').textContent = message;
+    });
+    ipcRenderer.on('show-reset-button', () => {
+      document.getElementById('reset-btn').style.display = 'inline-block';
+    });
+    function resetDataPath() {
+      ipcRenderer.send('reset-data-path-and-restart');
+    }
+  </script>
+</body>
+</html>
