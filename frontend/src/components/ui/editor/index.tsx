@@ -1148,7 +1148,7 @@ export function Editor({
             >
               {blockOptions.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {i18n.t(option.labelKey)}
                 </option>
               ))}
             </select>

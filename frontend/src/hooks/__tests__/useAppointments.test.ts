@@ -21,7 +21,7 @@ describe("useAppointmentsList", () => {
     });
 
     expect(result.current.appointments).toHaveLength(1);
-    expect(result.current.appointments[0].patient.fullName).toBe("John Doe");
+    expect(result.current.appointments[0]!.patient!.fullName).toBe("John Doe");
     expect(result.current.pagination?.totalItems).toBe(1);
     expect(result.current.isError).toBe(false);
   });

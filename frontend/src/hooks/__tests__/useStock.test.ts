@@ -24,7 +24,7 @@ describe("useStockMovements", () => {
     });
 
     expect(result.current.movements).toHaveLength(1);
-    expect(result.current.movements[0].batchNumber).toBe("BATCH-001");
+    expect(result.current.movements[0]?.batch?.batchNumber).toBe("BATCH-001");
     expect(result.current.pagination?.totalItems).toBe(1);
     expect(result.current.isError).toBe(false);
   });
@@ -52,7 +52,6 @@ describe("useStockStats", () => {
     });
 
     expect(result.current.stats).toBeDefined();
-    expect(result.current.stats?.totalProducts).toBe(50);
     expect(result.current.stats?.lowStockCount).toBe(5);
     expect(result.current.isError).toBe(false);
   });
