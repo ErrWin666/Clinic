@@ -2,6 +2,7 @@ const config = require("./index");
 
 const isTest = config.server.nodeEnv === "test";
 const isDevOrTest = config.server.isDev || isTest;
+const isElectron = process.env.ELECTRON_APP === "true";
 
 module.exports = {
   jwtSecret: config.auth.jwtSecret,
@@ -11,8 +12,8 @@ module.exports = {
   bcryptRounds: config.auth.bcryptRounds,
   cookieOptions: {
     httpOnly: true,
-    secure: !isDevOrTest,
-    sameSite: isDevOrTest ? "lax" : "strict",
+    secure: !isDevOrTest && !isElectron,
+    sameSite: isDevOrTest || isElectron ? "lax" : "strict",
     path: "/",
   },
 };

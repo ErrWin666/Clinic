@@ -126,6 +126,7 @@ async function bootSequence() {
       BACKUP_DIR: backupsDir,
       LOG_DIR: logsDir,
       NODE_ENV: "production",
+      ELECTRON_APP: "true",
       DB_MIGRATE: "auto",
       JWT_SECRET: crypto.randomBytes(48).toString("hex"),
       JWT_REFRESH_SECRET: crypto.randomBytes(48).toString("hex"),
@@ -237,7 +238,6 @@ function createMainWindow(backendPort) {
       pathname: path.resolve(frontendPath),
       query: { port: String(backendPort) },
     }));
-    win.webContents.openDevTools();
   }
 
   // Strip Origin header from all outgoing requests to prevent CORS issues with file:// protocol
