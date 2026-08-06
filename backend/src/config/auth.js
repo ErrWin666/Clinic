@@ -13,7 +13,7 @@ module.exports = {
   cookieOptions: {
     httpOnly: true,
     secure: !isDevOrTest && !isElectron,
-    sameSite: isElectron ? "none" : (isDevOrTest ? "lax" : "strict"),
+    sameSite: isDevOrTest || isElectron ? "lax" : "strict",
     path: "/",
   },
 };

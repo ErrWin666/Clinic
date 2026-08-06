@@ -120,6 +120,7 @@ async function bootSequence() {
     await runMigrationsWithRollback(dbPath, backupsDir);
 
     // 3. Start backend
+    const frontendDistPath = path.join(__dirname, "frontend", "dist");
     const backendEnv = {
       DB_STORAGE: dbPath,
       UPLOAD_DIR: uploadsDir,
@@ -131,6 +132,7 @@ async function bootSequence() {
       JWT_SECRET: crypto.randomBytes(48).toString("hex"),
       JWT_REFRESH_SECRET: crypto.randomBytes(48).toString("hex"),
       SCHEDULER_ENABLED: "true",
+      FRONTEND_DIST: frontendDistPath,
     };
 
     currentBackendEnv = backendEnv;
@@ -231,13 +233,7 @@ function createMainWindow(backendPort) {
     win.loadURL("http://localhost:5173");
     win.webContents.openDevTools();
   } else {
-    const frontendPath = path.join(__dirname, "frontend", "dist", "index.html");
-    win.loadURL(url.format({
-      slashes: true,
-      protocol: "file:",
-      pathname: path.resolve(frontendPath),
-      query: { port: String(backendPort) },
-    }));
+    win.loadURL(`http://127.0.0.1:${backendPort}/`);
   }
 
   // Strip Origin header from all outgoing requests to prevent CORS issues with file:// protocol

@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const helmet = require("helmet");
 const cors = require("cors");
 const compression = require("compression");
@@ -21,7 +22,12 @@ for (const warning of config.warnings) {
   logger.warn(warning);
 }
 
-app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+const isElectron = process.env.ELECTRON_APP === "true";
+
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: isElectron ? false : undefined,
+}));
 app.use(cors(serverConfig.cors));
 app.use(compression());
 app.use(express.json({ limit: serverConfig.bodyLimit }));
@@ -46,6 +52,16 @@ app.get("/api/health", (req, res) => {
 app.use("/api", apiLimiter, sanitizeInput, routes);
 
 app.use("/uploads", auth, uploadAuth, express.static(config.upload.dir));
+
+// In Electron production, serve the frontend dist from the backend (same-origin)
+if (process.env.ELECTRON_APP === "true") {
+  const frontendDist = process.env.FRONTEND_DIST || path.join(__dirname, "..", "..", "frontend", "dist");
+  app.use(express.static(frontendDist));
+  // SPA fallback: serve index.html for any non-API, non-uploads route
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(frontendDist, "index.html"));
+  });
+}
 
 app.use(notFoundHandler);
 app.use(errorHandler);
