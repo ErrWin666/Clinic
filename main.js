@@ -120,7 +120,10 @@ async function bootSequence() {
     await runMigrationsWithRollback(dbPath, backupsDir);
 
     // 3. Start backend
-    const frontendDistPath = path.join(__dirname, "frontend", "dist");
+    let frontendDistPath = path.join(__dirname, "frontend", "dist");
+    if (app.isPackaged && frontendDistPath.includes("app.asar")) {
+      frontendDistPath = frontendDistPath.replace("app.asar", "app.asar.unpacked");
+    }
     const backendEnv = {
       DB_STORAGE: dbPath,
       UPLOAD_DIR: uploadsDir,
