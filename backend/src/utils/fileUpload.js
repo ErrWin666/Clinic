@@ -147,4 +147,26 @@ const uploadClinicLogo = multer({
   limits: { fileSize: ENUMS.MAX_IMAGE_SIZE },
 });
 
-module.exports = { upload, uploadImage, uploadClinicLogo, verifyMagicBytes };
+// Clinic notes file storage — saves to uploads/clinic-notes/ directory
+const clinicNotesStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const fs = require("fs");
+    const dir = path.resolve(config.upload.dir, "clinic-notes");
+    fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const { v4: uuidv4 } = require("uuid");
+    const shortId = uuidv4().split("-")[0];
+    cb(null, `note-${Date.now()}-${shortId}${ext}`);
+  },
+});
+
+const uploadClinicNoteFile = multer({
+  storage: clinicNotesStorage,
+  fileFilter,
+  limits: { fileSize: ENUMS.MAX_FILE_SIZE },
+});
+
+module.exports = { upload, uploadImage, uploadClinicLogo, uploadClinicNoteFile, verifyMagicBytes };

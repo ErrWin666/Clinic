@@ -5,6 +5,7 @@ import {
   type ImagePickerResult,
   type FileInsertHandler,
 } from "@/components/ui/editor";
+import type { Editor as TiptapEditor } from "@tiptap/core";
 import { UploadService } from "@/services/UploadService";
 import { FileService } from "@/services/FileService";
 import { useQueryClient } from "@tanstack/react-query";
@@ -16,6 +17,10 @@ interface NotesEditorProps {
   value: string;
   onChange: (value: string) => void;
   patientId?: number;
+  uploadContext?:
+    | { kind: "patient"; patientId: number }
+    | { kind: "clinic" }
+    | { kind: "none" };
   showToolbar?: boolean;
   editorClassName?: string;
 }
@@ -24,17 +29,23 @@ export function NotesEditor({
   value,
   onChange,
   patientId,
+  uploadContext,
   showToolbar = true,
   editorClassName,
 }: NotesEditorProps) {
   const { t } = useTranslation();
   const { handleApiError } = useApiError();
   const queryClient = useQueryClient();
+
+  const ctx = uploadContext ?? (patientId ? { kind: "patient" as const, patientId } : { kind: "none" as const });
+  const canUpload = ctx.kind !== "none";
   const handleUploadImage = useCallback(
     async (file: File) => {
-      if (!patientId) return null;
+      if (!canUpload) return null;
       try {
-        const response = await UploadService.uploadImage(patientId, file);
+        const response = ctx.kind === "patient"
+          ? await UploadService.uploadImage(ctx.patientId, file)
+          : await UploadService.uploadGeneralImage(file);
         if (response.success && response.data?.src) {
           return { src: response.data.src, alt: file.name };
         }
@@ -43,7 +54,7 @@ export function NotesEditor({
       }
       return null;
     },
-    [patientId]
+    [canUpload, ctx]
   );
 
   const handleRequestImage = useCallback(
@@ -58,12 +69,14 @@ export function NotesEditor({
             resolve(null);
             return;
           }
-          if (!patientId) {
+          if (!canUpload) {
             resolve(null);
             return;
           }
           try {
-            const response = await UploadService.uploadImage(patientId, file);
+            const response = ctx.kind === "patient"
+              ? await UploadService.uploadImage(ctx.patientId, file)
+              : await UploadService.uploadGeneralImage(file);
             if (response.success && response.data?.src) {
               resolve({
                 kind: "url",
@@ -79,12 +92,13 @@ export function NotesEditor({
         input.click();
       });
     },
-    [patientId]
+    [canUpload, ctx]
   );
 
   const handleRequestFile = useCallback<FileInsertHandler>(
-    () => {
-      if (!patientId) return;
+    (editor: TiptapEditor) => {
+      if (!canUpload) return;
+      const currentPatientId = ctx.kind === "patient" ? ctx.patientId : undefined;
       return new Promise<void>((resolve) => {
         const input = document.createElement("input");
         input.type = "file";
@@ -96,15 +110,47 @@ export function NotesEditor({
             return;
           }
           try {
-            const response = await FileService.uploadFile(patientId, file, null);
-            if (response.success && response.data) {
-              const downloadUrl = FileService.getFileDownloadUrl(patientId, response.data.id);
-              const markdownLink = `[${file.name}](${downloadUrl})`;
-              const currentValue = value;
-              const newValue = currentValue ? `${currentValue}\n\n${markdownLink}` : markdownLink;
-              onChange(newValue);
-              toast.success(t("notes.fileAttached"));
-              void queryClient.invalidateQueries({ queryKey: ["files", patientId] });
+            if (currentPatientId) {
+              const response = await FileService.uploadFile(currentPatientId, file, null);
+              if (response.success && response.data) {
+                const downloadUrl = FileService.getFileDownloadUrl(currentPatientId, response.data.id);
+                editor
+                  .chain()
+                  .focus()
+                  .insertContent({
+                    type: "paragraph",
+                    content: [
+                      {
+                        type: "text",
+                        text: file.name,
+                        marks: [{ type: "link", attrs: { href: downloadUrl, target: "_blank" } }],
+                      },
+                    ],
+                  })
+                  .run();
+                toast.success(t("notes.fileAttached"));
+                void queryClient.invalidateQueries({ queryKey: ["files", currentPatientId] });
+              }
+            } else {
+              const response = await UploadService.uploadGeneralFile(file);
+              if (response.success && response.data?.src) {
+                const fileUrl = response.data.src;
+                editor
+                  .chain()
+                  .focus()
+                  .insertContent({
+                    type: "paragraph",
+                    content: [
+                      {
+                        type: "text",
+                        text: file.name,
+                        marks: [{ type: "link", attrs: { href: fileUrl, target: "_blank" } }],
+                      },
+                    ],
+                  })
+                  .run();
+                toast.success(t("notes.fileAttached"));
+              }
             }
           } catch (error) {
             handleApiError(error);
@@ -114,7 +160,7 @@ export function NotesEditor({
         input.click();
       });
     },
-    [patientId, value, onChange, queryClient, t, handleApiError]
+    [canUpload, ctx, queryClient, t, handleApiError]
   );
 
   return (
@@ -122,11 +168,11 @@ export function NotesEditor({
       value={value}
       onChange={onChange}
       format="markdown"
-      enableImages={true}
-      enableImagePasteDrop={true}
+      enableImages={canUpload}
+      enableImagePasteDrop={canUpload}
       onUploadImage={handleUploadImage}
       onRequestImage={handleRequestImage}
-      onRequestFile={patientId ? handleRequestFile : undefined}
+      onRequestFile={canUpload ? handleRequestFile : undefined}
       imageFallback="none"
       showToolbar={showToolbar}
       editorClassName={editorClassName ?? "min-h-[120px] max-h-[300px] overflow-y-auto"}

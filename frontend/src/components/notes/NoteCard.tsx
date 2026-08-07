@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { SecureImage } from "@/components/common/SecureImage";
 import { DeleteConfirmDialog } from "@/components/common/DeleteConfirmDialog";
+import { MarkdownDisplay } from "@/components/common/MarkdownDisplay";
 import { formatFileSize, isImageType, isPdfType } from "@/lib/fileUtils";
 import { ENUMS } from "@/types/enums";
 import type { NoteAttachment } from "@/types/models";
@@ -83,9 +84,10 @@ export function NoteCard({
           )}
           <div
             ref={contentRef}
-            className={`prose prose-sm dark:prose-invert max-w-full text-sm text-muted-foreground break-words overflow-x-auto ${expanded ? "" : "max-h-24 overflow-hidden"}`}
-            dangerouslySetInnerHTML={{ __html: note.content }}
-          />
+            className={`max-w-full text-sm text-muted-foreground break-words overflow-x-auto ${expanded ? "" : "max-h-24 overflow-hidden"}`}
+          >
+            <MarkdownDisplay value={note.content} />
+          </div>
           {!expanded && isOverflowing && (
             <div className="pointer-events-none -mt-4 h-4 bg-gradient-to-b from-transparent to-card" />
           )}

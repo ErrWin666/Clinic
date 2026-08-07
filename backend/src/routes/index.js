@@ -33,6 +33,7 @@ const packagingUnitRoutes = require("./packagingUnitRoutes");
 const stocktakingRoutes = require("./stocktakingRoutes");
 const clinicNoteRoutes = require("./clinicNoteRoutes");
 const patientNoteRoutes = require("./patientNoteRoutes");
+const generalUploadRoutes = require("./generalUploadRoutes");
 
 router.use("/setup", setupRoutes);
 router.use("/auth", authRoutes);
@@ -72,5 +73,6 @@ router.use("/stocktaking", stocktakingRoutes);
 
 // Notes
 router.use("/clinic-notes", clinicNoteRoutes);
+router.use("/upload", generalUploadRoutes);
 
 module.exports = router;

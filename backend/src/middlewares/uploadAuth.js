@@ -30,6 +30,11 @@ function uploadAuth(req, res, next) {
       return next();
     }
 
+    // Clinic notes attachments — readable by any authenticated user with notes access
+    if (parts[0] === "clinic-notes") {
+      return next();
+    }
+
     // TODO: bind patient file access to an explicit per-patient permission
     // once the business rule is defined. Today any authenticated user may
     // read patient attachments, which matches the current product behaviour.

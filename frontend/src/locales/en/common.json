@@ -741,6 +741,7 @@
     "titlePlaceholder": "Note title (optional)",
     "content": "Content",
     "formDescription": "Write a note with rich text formatting",
+    "ctrlEnterHint": "Press Ctrl+Enter to save",
     "note": "note",
     "untitledNote": "Untitled Note",
     "attachment": "attachment"
@@ -1490,13 +1491,32 @@
       "saveAltText": "Save alt text",
       "removeAltText": "Remove alt text",
       "addRow": "Add row",
+      "addRowBefore": "Add row before",
       "removeRow": "Remove row",
       "addColumn": "Add column",
-      "removeColumn": "Remove column"
+      "addColumnBefore": "Add column before",
+      "removeColumn": "Remove column",
+      "deleteTable": "Delete table",
+      "mergeCells": "Merge cells",
+      "splitCell": "Split cell",
+      "toggleHeaderRow": "Toggle header row",
+      "alignLeft": "Align left",
+      "alignCenter": "Align center",
+      "alignRight": "Align right",
+      "insertTable": "Insert table"
     },
     "labels": {
       "rows": "Rows:",
       "columns": "Columns:"
+    },
+    "dialogs": {
+      "insertTableTitle": "Insert table",
+      "insertTableDescription": "Specify the number of rows and columns for the new table",
+      "rowsCount": "Number of rows",
+      "colsCount": "Number of columns",
+      "withHeaderRow": "Header row",
+      "withHeaderRowHint": "First row as column headers",
+      "insert": "Insert"
     }
   },
   "clinicNotes": {

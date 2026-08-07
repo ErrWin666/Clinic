@@ -741,6 +741,7 @@
     "titlePlaceholder": "عنوان الملاحظة (اختياري)",
     "content": "المحتوى",
     "formDescription": "اكتب ملاحظة بتنسيق نص غني",
+    "ctrlEnterHint": "اضغط Ctrl+Enter للحفظ",
     "note": "ملاحظة",
     "untitledNote": "ملاحظة بدون عنوان",
     "attachment": "مرفق"
@@ -1490,13 +1491,32 @@
       "saveAltText": "حفظ النص البديل",
       "removeAltText": "إزالة النص البديل",
       "addRow": "إضافة صف",
+      "addRowBefore": "إضافة صف قبل",
       "removeRow": "حذف صف",
       "addColumn": "إضافة عمود",
-      "removeColumn": "حذف عمود"
+      "addColumnBefore": "إضافة عمود قبل",
+      "removeColumn": "حذف عمود",
+      "deleteTable": "حذف الجدول",
+      "mergeCells": "دمج الخلايا",
+      "splitCell": "تقسيم الخلية",
+      "toggleHeaderRow": "تبديل صف الرؤوس",
+      "alignLeft": "محاذاة لليسار",
+      "alignCenter": "توسيط",
+      "alignRight": "محاذاة لليمين",
+      "insertTable": "إدراج جدول"
     },
     "labels": {
       "rows": "الصفوف:",
       "columns": "الأعمدة:"
+    },
+    "dialogs": {
+      "insertTableTitle": "إدراج جدول",
+      "insertTableDescription": "حدد عدد الصفوف والأعمدة للجدول الجديد",
+      "rowsCount": "عدد الصفوف",
+      "colsCount": "عدد الأعمدة",
+      "withHeaderRow": "صف رؤوس",
+      "withHeaderRowHint": "الصف الأول كرؤوس للأعمدة",
+      "insert": "إدراج"
     }
   },
   "clinicNotes": {

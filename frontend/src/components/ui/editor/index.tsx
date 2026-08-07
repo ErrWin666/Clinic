@@ -39,6 +39,17 @@ import {
   Undo2,
   Redo2,
   Image as ImageIcon,
+  Trash2,
+  TableCellsMerge,
+  TableCellsSplit,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  TableRowsSplit,
+  ArrowUpToLine,
+  ArrowDownToLine,
+  ArrowLeftToLine,
+  ArrowRightToLine,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -99,7 +110,7 @@ const UploadableImage = Image.extend({
   },
 });
 
-export type FileInsertHandler = () => void | Promise<void>;
+export type FileInsertHandler = (editor: TiptapEditor) => void | Promise<void>;
 
 export type EditorProps = {
   value?: string;
@@ -277,6 +288,10 @@ export function Editor({
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [showTableActions, setShowTableActions] = useState(false);
   const [showAltInput, setShowAltInput] = useState(false);
+  const [showInsertTable, setShowInsertTable] = useState(false);
+  const [tableRows, setTableRows] = useState(3);
+  const [tableCols, setTableCols] = useState(3);
+  const [tableWithHeader, setTableWithHeader] = useState(true);
   const [isInTable, setIsInTable] = useState(false);
   const [isOnImage, setIsOnImage] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
@@ -287,8 +302,11 @@ export function Editor({
   const pendingUploadsRef = useRef(0);
   const objectUrlByUploadIdRef = useRef(new Map<string, string>());
   const expectedBlobByUploadIdRef = useRef(new Map<string, string>());
+  // Border + rounded corners are provided by the wrapper div around toolbar +
+  // EditorContent, so the .tiptap surface itself does not need them. Focus
+  // styling also moves to the wrapper (focus-within).
   const tiptapSurfaceClass = cn(
-    "border-input placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm [&_p.is-empty::before]:text-muted-foreground [&_p.is-empty::before]:content-[attr(data-placeholder)] [&_p.is-empty::before]:pointer-events-none [&_p.is-empty::before]:float-left [&_p.is-empty::before]:h-0 [&_td_p.is-empty::before]:content-none [&_th_p.is-empty::before]:content-none [&_img[data-uploading=true]]:opacity-70 [&_img[data-uploading=true]]:animate-pulse [&_img[data-upload-error]]:ring-2 [&_img[data-upload-error]]:ring-destructive [&_img[data-upload-error]]:ring-offset-2 [&_img[data-upload-error]]:ring-offset-background",
+    "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 min-h-16 w-full bg-transparent px-3 py-2 text-base outline-none md:text-sm [&_p.is-empty::before]:text-muted-foreground [&_p.is-empty::before]:content-[attr(data-placeholder)] [&_p.is-empty::before]:pointer-events-none [&_p.is-empty::before]:float-left [&_p.is-empty::before]:h-0 [&_td_p.is-empty::before]:content-none [&_th_p.is-empty::before]:content-none [&_img[data-uploading=true]]:opacity-70 [&_img[data-uploading=true]]:animate-pulse [&_img[data-upload-error]]:ring-2 [&_img[data-upload-error]]:ring-destructive [&_img[data-upload-error]]:ring-offset-2 [&_img[data-upload-error]]:ring-offset-background",
     editorClassName,
   );
 
@@ -909,9 +927,29 @@ export function Editor({
   };
 
   const addRow = () => editor.chain().focus().addRowAfter().run();
+  const addRowBefore = () => editor.chain().focus().addRowBefore().run();
   const removeRow = () => editor.chain().focus().deleteRow().run();
   const addColumn = () => editor.chain().focus().addColumnAfter().run();
+  const addColumnBefore = () => editor.chain().focus().addColumnBefore().run();
   const removeColumn = () => editor.chain().focus().deleteColumn().run();
+  const deleteTable = () => editor.chain().focus().deleteTable().run();
+  const mergeCells = () => editor.chain().focus().mergeCells().run();
+  const splitCell = () => editor.chain().focus().splitCell().run();
+  const toggleHeaderRow = () => editor.chain().focus().toggleHeaderRow().run();
+  const alignCell = (align: "left" | "center" | "right") =>
+    editor.chain().focus().setCellAttribute("align", align).run();
+  const insertTableWith = (rows: number, cols: number, withHeaderRow: boolean) =>
+    editor.chain().focus().insertTable({ rows, cols, withHeaderRow }).run();
+  const confirmInsertTable = () => {
+    insertTableWith(tableRows, tableCols, tableWithHeader);
+    setShowInsertTable(false);
+  };
+  const openInsertTable = () => {
+    setTableRows(3);
+    setTableCols(3);
+    setTableWithHeader(true);
+    setShowInsertTable(true);
+  };
 
   const toolbarButtonClass =
     "inline-flex size-7 items-center justify-center rounded-md transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50";
@@ -942,7 +980,7 @@ export function Editor({
     </button>
   );
   return (
-    <div {...props} className={cn("", className)}>
+    <div {...props} className={cn("cn-editor", className)}>
       <BubbleMenu
         pluginKey="editor-bubble"
         ref={bubbleMenuRef}
@@ -1104,10 +1142,17 @@ export function Editor({
               data-state="open"
               className="border-border bg-popover data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-top-1 inline-flex w-fit flex-nowrap items-center gap-1 overflow-x-auto self-end rounded-md border p-1 shadow-sm duration-200 whitespace-nowrap"
             >
+              {/* Rows group */}
               <span className="text-sm ml-1 text-muted-foreground">{i18n.t("editor.labels.rows")}</span>
               {renderIconButton({
+                label: i18n.t("editor.actions.addRowBefore"),
+                icon: ArrowUpToLine,
+                onClick: addRowBefore,
+                disabled,
+              })}
+              {renderIconButton({
                 label: i18n.t("editor.actions.addRow"),
-                icon: Plus,
+                icon: ArrowDownToLine,
                 onClick: addRow,
                 disabled,
               })}
@@ -1118,10 +1163,17 @@ export function Editor({
                 disabled,
               })}
               <span className="bg-border mx-0.5 h-4 w-px" aria-hidden="true" />
+              {/* Columns group */}
               <span className="text-sm text-muted-foreground">{i18n.t("editor.labels.columns")}</span>
               {renderIconButton({
+                label: i18n.t("editor.actions.addColumnBefore"),
+                icon: ArrowLeftToLine,
+                onClick: addColumnBefore,
+                disabled,
+              })}
+              {renderIconButton({
                 label: i18n.t("editor.actions.addColumn"),
-                icon: Plus,
+                icon: ArrowRightToLine,
                 onClick: addColumn,
                 disabled,
               })}
@@ -1131,12 +1183,62 @@ export function Editor({
                 onClick: removeColumn,
                 disabled,
               })}
+              <span className="bg-border mx-0.5 h-4 w-px" aria-hidden="true" />
+              {/* Cells group */}
+              {renderIconButton({
+                label: i18n.t("editor.actions.mergeCells"),
+                icon: TableCellsMerge,
+                onClick: mergeCells,
+                disabled,
+              })}
+              {renderIconButton({
+                label: i18n.t("editor.actions.splitCell"),
+                icon: TableCellsSplit,
+                onClick: splitCell,
+                disabled,
+              })}
+              {renderIconButton({
+                label: i18n.t("editor.actions.toggleHeaderRow"),
+                icon: TableRowsSplit,
+                onClick: toggleHeaderRow,
+                disabled,
+              })}
+              <span className="bg-border mx-0.5 h-4 w-px" aria-hidden="true" />
+              {/* Alignment group */}
+              {renderIconButton({
+                label: i18n.t("editor.actions.alignLeft"),
+                icon: AlignLeft,
+                onClick: () => alignCell("left"),
+                disabled,
+              })}
+              {renderIconButton({
+                label: i18n.t("editor.actions.alignCenter"),
+                icon: AlignCenter,
+                onClick: () => alignCell("center"),
+                disabled,
+              })}
+              {renderIconButton({
+                label: i18n.t("editor.actions.alignRight"),
+                icon: AlignRight,
+                onClick: () => alignCell("right"),
+                disabled,
+              })}
+              <span className="bg-border mx-0.5 h-4 w-px" aria-hidden="true" />
+              {/* Delete whole table */}
+              {renderIconButton({
+                label: i18n.t("editor.actions.deleteTable"),
+                icon: Trash2,
+                onClick: deleteTable,
+                disabled,
+                className: "text-destructive hover:text-destructive",
+              })}
             </div>
           ) : null}
         </div>
       </BubbleMenu>
+      <div className="relative rounded-md border border-input overflow-visible transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50">
       {showToolbar && editor ? (
-        <div className="flex flex-nowrap items-center gap-0.5 overflow-x-auto border-b border-border bg-muted/30 px-2 py-1 whitespace-nowrap rounded-t-md">
+        <div className="flex flex-nowrap items-center gap-0.5 overflow-x-auto border-b border-border bg-muted/40 px-2 py-1 whitespace-nowrap">
           {/* Block type selector */}
           <div className="group/native-select relative w-fit">
             <select
@@ -1268,11 +1370,12 @@ export function Editor({
               })
             : null}
           {renderIconButton({
-            label: i18n.t("editor.actions.table"),
+            label: i18n.t("editor.actions.insertTable"),
             icon: TableIcon,
-            onClick: () =>
-              editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(),
+            onClick: openInsertTable,
             disabled,
+            toggle: true,
+            pressed: showInsertTable,
           })}
           {onRequestFile
             ? renderIconButton({
@@ -1280,7 +1383,7 @@ export function Editor({
                 icon: Paperclip,
                 onClick: () => {
                   if (onRequestFile) {
-                    void onRequestFile();
+                    void onRequestFile(editor);
                   }
                 },
                 disabled,
@@ -1302,7 +1405,70 @@ export function Editor({
           })}
         </div>
       ) : null}
+      {showInsertTable ? (
+        <div
+          data-state="open"
+          className="absolute z-50 end-1 top-12 w-64 rounded-lg border border-border bg-popover p-3 shadow-popover data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
+        >
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-sm font-medium">{i18n.t("editor.dialogs.insertTableTitle")}</span>
+            <button
+              type="button"
+              aria-label={i18n.t("common.close")}
+              onClick={() => setShowInsertTable(false)}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="size-4" />
+            </button>
+          </div>
+          <p className="mb-3 text-xs text-muted-foreground">{i18n.t("editor.dialogs.insertTableDescription")}</p>
+          <div className="flex flex-col gap-3">
+            <label className="flex items-center justify-between gap-2 text-xs">
+              <span className="text-muted-foreground">{i18n.t("editor.dialogs.rowsCount")}</span>
+              <input
+                type="number"
+                min={1}
+                max={20}
+                value={tableRows}
+                onChange={(e) => setTableRows(Math.max(1, Math.min(20, Number(e.target.value) || 1)))}
+                className="h-7 w-16 rounded-md border border-input bg-background px-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+              />
+            </label>
+            <label className="flex items-center justify-between gap-2 text-xs">
+              <span className="text-muted-foreground">{i18n.t("editor.dialogs.colsCount")}</span>
+              <input
+                type="number"
+                min={1}
+                max={20}
+                value={tableCols}
+                onChange={(e) => setTableCols(Math.max(1, Math.min(20, Number(e.target.value) || 1)))}
+                className="h-7 w-16 rounded-md border border-input bg-background px-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+              />
+            </label>
+            <label className="flex items-center gap-2 text-xs">
+              <input
+                type="checkbox"
+                checked={tableWithHeader}
+                onChange={(e) => setTableWithHeader(e.target.checked)}
+                className="size-4 rounded border-input"
+              />
+              <span>
+                {i18n.t("editor.dialogs.withHeaderRow")}
+                <span className="block text-muted-foreground text-[10px]">{i18n.t("editor.dialogs.withHeaderRowHint")}</span>
+              </span>
+            </label>
+            <button
+              type="button"
+              onClick={confirmInsertTable}
+              className="inline-flex h-8 items-center justify-center rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              {i18n.t("editor.dialogs.insert")}
+            </button>
+          </div>
+        </div>
+      ) : null}
       <EditorContent editor={editor} />
+      </div>
     </div>
   );
 }
