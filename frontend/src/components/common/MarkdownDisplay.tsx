@@ -109,7 +109,7 @@ export const MarkdownDisplay = memo(function MarkdownDisplay({
       em: ({ children }: { children?: React.ReactNode }) => (
         <em className="italic">{children}</em>
       ),
-      img: ({ src, alt, title }: { src?: string; alt?: string; title?: string }) => {
+      img: ({ src, alt }: { src?: string; alt?: string; title?: string }) => {
         if (!src) return null;
         const resolved = resolveUrl(src);
         return (

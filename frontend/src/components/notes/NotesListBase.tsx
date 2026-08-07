@@ -36,11 +36,11 @@ export interface NotesListBaseProps {
   isDeleting: boolean;
   isUploading: boolean;
   isDeletingAttachment: boolean;
-  onCreate: (data: { title: string | null; content: string }) => Promise<void>;
-  onUpdate: (id: number, data: { title: string | null; content: string }) => Promise<void>;
-  onDelete: (id: number) => Promise<void>;
-  onUploadAttachments: (noteId: number, files: File[]) => Promise<void>;
-  onDeleteAttachment: (noteId: number, fileId: number) => Promise<void>;
+  onCreate: (data: { title: string | null; content: string }) => Promise<unknown>;
+  onUpdate: (id: number, data: { title: string | null; content: string }) => Promise<unknown>;
+  onDelete: (id: number) => Promise<unknown>;
+  onUploadAttachments: (noteId: number, files: File[]) => Promise<unknown>;
+  onDeleteAttachment: (noteId: number, fileId: number) => Promise<unknown>;
   getAttachmentUrl: (noteId: number, fileId: number) => string;
   getAttachmentPreviewUrl: (noteId: number, fileId: number) => string;
   uploadContext: { kind: "patient"; patientId: number } | { kind: "clinic" } | { kind: "none" };
@@ -77,7 +77,6 @@ export function NotesListBase({
   noNotesKey,
   search,
   onSearchChange,
-  page,
   onPageChange,
 }: NotesListBaseProps) {
   const { t } = useTranslation();

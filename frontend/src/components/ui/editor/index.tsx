@@ -22,7 +22,6 @@ import {
   ChevronDownIcon,
   Code,
   Minus,
-  Plus,
   Paperclip,
   RemoveFormatting,
   Table as TableIcon,
