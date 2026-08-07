@@ -123,7 +123,7 @@ class SettingsService extends BaseService {
       map[s.key.replace(/^backup\./, "")] = safeJsonParse(s.value);
     }
     return {
-      enabled: map.enabled !== undefined ? Boolean(map.enabled) : true,
+      enabled: map.enabled !== undefined ? map.enabled === true || map.enabled === "true" : true,
       hour: map.scheduleHour !== undefined ? Number(map.scheduleHour) : 2,
       minute: map.scheduleMinute !== undefined ? Number(map.scheduleMinute) : 0,
     };

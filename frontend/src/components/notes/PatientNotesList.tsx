@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useDeferredValue, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { usePatientNotes } from "@/hooks/usePatientNotes";
 import { PatientNoteService } from "@/services/PatientNoteService";
@@ -20,6 +20,7 @@ interface PatientNotesListProps {
 export function PatientNotesList({ patientId }: PatientNotesListProps) {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search);
   const [page, setPage] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ id: number; title: string | null } | null>(null);
@@ -31,7 +32,9 @@ export function PatientNotesList({ patientId }: PatientNotesListProps) {
 
   const { notes, pagination, isLoading, isError, refetch, isCreating, isUpdating, isDeleting, isUploading, isDeletingAttachment,
     createNote, updateNote, deleteNote, uploadAttachments, deleteAttachment } =
-    usePatientNotes(patientId, { search: search || undefined, page, pageSize: 10 });
+    usePatientNotes(patientId, { search: deferredSearch || undefined, page, pageSize: 10 });
+
+  const totalCount = useMemo(() => pagination?.totalItems ?? notes.length, [pagination, notes.length]);
 
   const handleCreate = () => {
     setEditingNote(null);
@@ -101,7 +104,11 @@ export function PatientNotesList({ patientId }: PatientNotesListProps) {
           title="patientNotes.noNotes"
         />
       ) : (
-        <div className="flex flex-col gap-3">
+        <>
+          <div className="text-xs text-muted-foreground">
+            {t("common.pagination.showing", { current: notes.length, total: totalCount })}
+          </div>
+          <div className="flex flex-col gap-3">
           {notes.map((note) => (
             <NoteCard
               key={note.id}
@@ -120,7 +127,8 @@ export function PatientNotesList({ patientId }: PatientNotesListProps) {
               }
             />
           ))}
-        </div>
+          </div>
+        </>
       )}
 
       {pagination && pagination.totalPages > 1 && (
@@ -136,7 +144,7 @@ export function PatientNotesList({ patientId }: PatientNotesListProps) {
         initialTitle={editingNote?.title}
         initialContent={editingNote?.content}
         onSubmit={handleSubmit}
-        isSubmitting={isCreating || isUpdating || isDeleting}
+        isSubmitting={isCreating || isUpdating}
         patientId={patientId}
       />
 

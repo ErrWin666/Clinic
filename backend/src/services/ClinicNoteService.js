@@ -78,6 +78,20 @@ class ClinicNoteService extends BaseService {
       if (!note) {
         throw new CustomError(MESSAGES.CLINIC_NOTE.NOT_FOUND, "CLINIC_NOTE_NOT_FOUND", 404);
       }
+      // Delete attachment files from disk
+      if (note.attachments && note.attachments.length > 0) {
+        for (const file of note.attachments) {
+          const fullPath = path.resolve(config.upload.dir, file.path);
+          if (fs.existsSync(fullPath)) {
+            try {
+              fs.unlinkSync(fullPath);
+            } catch (err) {
+              require("../utils/logger").warn(`Failed to delete attachment file: ${fullPath}`);
+            }
+          }
+          await file.destroy();
+        }
+      }
       await note.destroy();
       return true;
     }, MESSAGES.CLINIC_NOTE.DELETED, "CLINIC_NOTE_DELETE_ERROR");

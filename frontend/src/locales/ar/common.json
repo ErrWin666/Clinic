@@ -120,7 +120,8 @@
     "of": "من",
     "pagination": {
       "page": "صفحة {{current}} من {{total}}",
-      "total": "{{count}} عنصر"
+      "total": "{{count}} عنصر",
+      "showing": "عرض {{current}} من {{total}} ملاحظة"
     },
     "globalSearch": "بحث عن مرضى...",
     "globalSearchNoResults": "لا توجد نتائج",
@@ -540,6 +541,7 @@
     "imageRemoved": "تم إزالة صورة الملف الشخصي بنجاح",
     "saveNotes": "حفظ الملاحظات",
     "notesSaved": "تم حفظ الملاحظات بنجاح",
+    "unsavedChanges": "تغييرات غير محفوظة",
     "backToPatients": "العودة للمرضى",
     "printSummary": "طباعة الملخص",
     "quickStats": "إحصائيات سريعة",

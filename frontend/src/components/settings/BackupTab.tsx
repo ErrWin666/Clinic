@@ -34,11 +34,11 @@ export function BackupTab() {
   const [scheduleEnabled, setScheduleEnabled] = useState(true);
   const [scheduleHour, setScheduleHour] = useState(2);
   const [scheduleMinute, setScheduleMinute] = useState(0);
-  const scheduleRef = useRef(scheduleData);
+  const scheduleDataRef = useRef(scheduleData?.data);
 
   useEffect(() => {
-    if (scheduleRef.current === scheduleData) return;
-    scheduleRef.current = scheduleData;
+    if (scheduleDataRef.current === scheduleData?.data) return;
+    scheduleDataRef.current = scheduleData?.data;
     const schedule = scheduleData?.data;
     if (schedule) {
       /* eslint-disable react-hooks/set-state-in-effect */

@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from "react";
+import { useState, useRef, lazy, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Dialog,
@@ -42,6 +42,7 @@ function NoteFormContent({
   const { t } = useTranslation();
   const [title, setTitle] = useState(initialTitle ?? "");
   const [content, setContent] = useState(initialContent ?? "");
+  const titleRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,18 +51,32 @@ function NoteFormContent({
     onDone();
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+      e.preventDefault();
+      if (content.trim()) {
+        void onSubmit({ title: title.trim() || null, content }).then(onDone);
+      }
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="flex flex-col gap-4">
       <FieldGroup className="gap-4">
         <Field className="gap-2">
           <FieldLabel htmlFor="note-title">{t("notes.title")}</FieldLabel>
           <Input
             id="note-title"
+            ref={titleRef}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder={t("notes.titlePlaceholder")}
             maxLength={255}
+            autoFocus
           />
+          {title.length > 200 && (
+            <span className="text-xs text-muted-foreground">{title.length}/255</span>
+          )}
         </Field>
         <Field className="gap-2">
           <FieldLabel htmlFor="note-content">{t("notes.content")}</FieldLabel>

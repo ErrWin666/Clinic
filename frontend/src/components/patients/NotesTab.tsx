@@ -43,6 +43,8 @@ export function NotesTab({ patient }: NotesTabProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const lastPatientNotesRef = useRef(patient.notes);
 
+  const isDirty = notes !== (patient.notes ?? "");
+
   const { files, filesPagination, uploadFile, isUploading } = useFiles(patient.id, null, { page: filesPage, pageSize: filesPageSize }, undefined, null);
 
   useEffect(() => {
@@ -225,8 +227,11 @@ export function NotesTab({ patient }: NotesTabProps) {
           )}
         </div>
 
-        <div className="flex justify-end">
-          <Button onClick={handleSave} disabled={isSaving} size="sm">
+        <div className="flex justify-end items-center gap-2">
+          {isDirty && (
+            <span className="text-xs text-warning">{t("patientProfile.unsavedChanges")}</span>
+          )}
+          <Button onClick={handleSave} disabled={isSaving || !isDirty} size="sm">
             {isSaving && <Spinner className="size-4" />}
             <SaveIcon className="size-4" />
             {t("patientProfile.saveNotes")}

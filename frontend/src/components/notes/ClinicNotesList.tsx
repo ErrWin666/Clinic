@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useDeferredValue, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useClinicNotes } from "@/hooks/useClinicNotes";
 import { ClinicNoteService } from "@/services/ClinicNoteService";
@@ -16,6 +16,7 @@ import { PlusIcon, SearchIcon, StickyNoteIcon } from "lucide-react";
 export function ClinicNotesList() {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search);
   const [page, setPage] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ id: number; title: string | null } | null>(null);
@@ -27,7 +28,9 @@ export function ClinicNotesList() {
 
   const { notes, pagination, isLoading, isError, refetch, isCreating, isUpdating, isDeleting, isUploading, isDeletingAttachment,
     createNote, updateNote, deleteNote, uploadAttachments, deleteAttachment } =
-    useClinicNotes({ search: search || undefined, page, pageSize: 10 });
+    useClinicNotes({ search: deferredSearch || undefined, page, pageSize: 10 });
+
+  const totalCount = useMemo(() => pagination?.totalItems ?? notes.length, [pagination, notes.length]);
 
   const handleCreate = () => {
     setEditingNote(null);
@@ -97,7 +100,11 @@ export function ClinicNotesList() {
           title="clinicNotes.noNotes"
         />
       ) : (
-        <div className="flex flex-col gap-3">
+        <>
+          <div className="text-xs text-muted-foreground">
+            {t("common.pagination.showing", { current: notes.length, total: totalCount })}
+          </div>
+          <div className="flex flex-col gap-3">
           {notes.map((note) => (
             <NoteCard
               key={note.id}
@@ -116,7 +123,8 @@ export function ClinicNotesList() {
               }
             />
           ))}
-        </div>
+          </div>
+        </>
       )}
 
       {pagination && pagination.totalPages > 1 && (
@@ -132,7 +140,7 @@ export function ClinicNotesList() {
         initialTitle={editingNote?.title}
         initialContent={editingNote?.content}
         onSubmit={handleSubmit}
-        isSubmitting={isCreating || isUpdating || isDeleting}
+        isSubmitting={isCreating || isUpdating}
       />
 
       <DeleteConfirmDialog

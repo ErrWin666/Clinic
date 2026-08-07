@@ -1,6 +1,9 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useLayoutEffect } from "react";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { SecureImage } from "@/components/common/SecureImage";
@@ -52,8 +55,17 @@ export function NoteCard({
 }: NoteCardProps) {
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const [expanded, setExpanded] = useState(false);
+  const [isOverflowing, setIsOverflowing] = useState(false);
   const [deleteAttachmentTarget, setDeleteAttachmentTarget] = useState<{ fileId: number; name: string } | null>(null);
+
+  useLayoutEffect(() => {
+    const el = contentRef.current;
+    if (el) {
+      setIsOverflowing(el.scrollHeight > 96);
+    }
+  }, [note.content]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0 && onUploadAttachments) {
@@ -63,35 +75,38 @@ export function NoteCard({
   };
 
   return (
-    <div className="group rounded-xl border border-border/60 bg-card p-4 shadow-card transition-all duration-300 hover:shadow-hover hover:ring-1 hover:ring-primary/15 overflow-hidden">
+    <div className="group rounded-xl border border-border/60 border-l-2 border-l-primary/40 bg-card p-4 shadow-card transition-all duration-300 hover:shadow-hover hover:ring-1 hover:ring-primary/15 overflow-hidden">
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           {note.title && (
             <h3 className="mb-1 text-sm font-semibold truncate">{note.title}</h3>
           )}
           <div
+            ref={contentRef}
             className={`prose prose-sm dark:prose-invert max-w-full text-sm text-muted-foreground break-words overflow-x-auto ${expanded ? "" : "max-h-24 overflow-hidden"}`}
             dangerouslySetInnerHTML={{ __html: note.content }}
           />
-          {!expanded && (
+          {!expanded && isOverflowing && (
             <div className="pointer-events-none -mt-4 h-4 bg-gradient-to-b from-transparent to-card" />
           )}
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="mt-1 flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
-          >
-            {expanded ? (
-              <>
-                <ChevronUpIcon className="size-3" />
-                {t("common.showLess")}
-              </>
-            ) : (
-              <>
-                <ChevronDownIcon className="size-3" />
-                {t("common.showMore")}
-              </>
-            )}
-          </button>
+          {isOverflowing && (
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="mt-1 flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+            >
+              {expanded ? (
+                <>
+                  <ChevronUpIcon className="size-3" />
+                  {t("common.showLess")}
+                </>
+              ) : (
+                <>
+                  <ChevronDownIcon className="size-3" />
+                  {t("common.showMore")}
+                </>
+              )}
+            </button>
+          )}
         </div>
         <div className="flex items-center gap-1 shrink-0">
           {onEdit && (
@@ -118,9 +133,9 @@ export function NoteCard({
         </div>
       </div>
 
-      <div className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
+      <div className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground" title={dayjs(note.createdAt).format("YYYY-MM-DD HH:mm")}>
         <ClockIcon className="size-3" />
-        {dayjs(note.createdAt).format("YYYY-MM-DD HH:mm")}
+        {dayjs(note.createdAt).fromNow()}
       </div>
 
       {onUploadAttachments && (

@@ -120,7 +120,8 @@
     "of": "of",
     "pagination": {
       "page": "Page {{current}} of {{total}}",
-      "total": "{{count}} items"
+      "total": "{{count}} items",
+      "showing": "Showing {{current}} of {{total}} notes"
     },
     "globalSearch": "Search patients...",
     "globalSearchNoResults": "No patients found",
@@ -540,6 +541,7 @@
     "imageRemoved": "Profile image removed successfully",
     "saveNotes": "Save Notes",
     "notesSaved": "Notes saved successfully",
+    "unsavedChanges": "Unsaved changes",
     "backToPatients": "Back to Patients",
     "printSummary": "Print Summary",
     "quickStats": "Quick Stats",

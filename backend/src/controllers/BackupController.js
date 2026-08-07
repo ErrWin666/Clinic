@@ -65,9 +65,9 @@ class BackupController extends BaseController {
       const { enabled, hour, minute } = req.body;
       const settingsService = new SettingsService();
       await settingsService.update([
-        { key: "backup.enabled", value: JSON.stringify(enabled), category: "backup" },
-        { key: "backup.scheduleHour", value: JSON.stringify(hour), category: "backup" },
-        { key: "backup.scheduleMinute", value: JSON.stringify(minute), category: "backup" },
+        { key: "backup.enabled", value: enabled, category: "backup" },
+        { key: "backup.scheduleHour", value: hour, category: "backup" },
+        { key: "backup.scheduleMinute", value: minute, category: "backup" },
       ]);
 
       const { rescheduleBackup } = require("../server");
