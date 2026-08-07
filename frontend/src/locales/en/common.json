@@ -1342,44 +1342,76 @@
       },
       "steps": {
         "1": {
-          "title": "Set up Products",
-          "description": "Start by creating products and their variants. Each product (frame, drops, contact lens) needs at least one variant with a SKU and sell price. You can also define packaging units (piece, box, carton) with conversion factors.",
-          "tip": "Use clear variant names like '-2.00' or '5ml' or 'Blue/Large' to make searching easier later."
+          "title": "Set up Products & Variants",
+          "description": "Start by creating products in the 'Products' tab. Each product (frame, drops, contact lens, supplies) belongs to a specific category: frames, frames-luxury, contact-lenses, drops, supplies, equipment, or other. After creating the product, add at least one variant. A variant is the actual stock-keeping unit — e.g., a frame with -2.00 prescription, or 5ml drops. Each variant requires: name, SKU, sell price, and a minimum quantity for alerts. You can also set barcode, max quantity, and location.",
+          "tip": "Use clear, consistent variant names like '-2.00' or '5ml' or 'Blue/Large' to make searching easier later.",
+          "info": "The costing method (FEFO/FIFO/average) is set when creating the product and affects how stock is deducted on sale. FEFO = First Expiry First Out (default for drops & lenses), FIFO = First In First Out (for frames), average = weighted average cost of all units."
         },
         "2": {
-          "title": "Add Suppliers",
-          "description": "Register the suppliers you deal with. For each supplier: name, phone, address, and an opening balance if you have prior debts. Suppliers are required for purchase orders and batch tracking.",
-          "tip": "Enter the supplier's opening balance if you had prior debts before using the system."
+          "title": "Packaging Units & Bundles",
+          "description": "For each variant you can define multiple packaging units (piece, box, carton) with conversion factors. For example: box = 12 pieces, carton = 24 boxes (288 pieces). This simplifies receiving in bulk and selling by unit. You can also create product bundles in the 'Product Bundles' tab — a set of variants sold together at a special price (e.g., frame + contact lenses + drops as a package).",
+          "tip": "Enter barcodes for each packaging unit to enable barcode scanning at sale and receiving. You can print barcode labels from the 'Print Barcode' button.",
+          "warning": "Conversion factors must be correct — an incorrect factor leads to stock calculation errors when receiving in bulk units."
         },
         "3": {
-          "title": "Enter Opening Stock",
-          "description": "Enter the quantities currently in the clinic via the 'Opening Stock' button in the Stock Movements tab. An OPENING batch will be created for each variant with unit cost and received date.",
-          "tip": "Count the physical stock before entering. You can enter opening stock for each variant separately."
+          "title": "Add Suppliers",
+          "description": "On the 'Suppliers' page, register each supplier you deal with. For each supplier: name, phone, address, and an opening balance if you have prior debts. Suppliers are required for purchase orders and batch tracking. You can also enter email, tax number, and contact person. Each supplier has a statement showing payables and payments.",
+          "tip": "Enter the supplier's opening balance if you had prior debts before using the system. This ensures accurate statements from the start.",
+          "info": "You can record payments to suppliers (cash, bank transfer, cheque) which automatically appear in the statement and update the balance."
         },
         "4": {
-          "title": "Create a Purchase Order",
-          "description": "When you need to order goods from a supplier, create a purchase order. Specify the supplier, items, quantities, and prices. A purchase order starts as 'draft' then you convert it to 'ordered'.",
-          "tip": "You can edit a purchase order before converting it to 'ordered'. After that, it cannot be edited."
+          "title": "Enter Opening Stock",
+          "description": "In the 'Stock Movements' tab, click 'Opening Stock' to enter quantities currently in the clinic. Select the product variant, enter quantity, unit cost, and received date. An OPENING batch will be created for each entry. You can enter opening stock for each variant separately. The movement appears as an inbound (in) with reason 'opening_stock'. The same tab shows statistics: total stock value, low stock count, out of stock, and expiring soon.",
+          "tip": "Count physical stock before entering. You can filter movements by type (in/out/adjust) and reason (purchase/sale/damage/expiry/adjustment/dispensing/opening_stock/recall).",
+          "warning": "The unit cost for opening stock is important — it's used to calculate stock value and profit/loss. Make sure to enter the correct cost."
         },
         "5": {
-          "title": "Receive Purchase Order (Inbound)",
-          "description": "When goods arrive, click 'Receive' on the purchase order. This will: create a batch for each item, generate an inbound stock movement, update stock automatically, and update the supplier account.",
-          "tip": "Verify that received quantities match the ordered ones. You can receive less than ordered (partial receipt)."
+          "title": "Create a Purchase Order",
+          "description": "On the 'Purchase Orders' page, create an order when you need to request goods from a supplier. Specify: supplier, order date, then add items (product variants) with quantities and prices. A purchase order goes through four statuses: 'draft' → 'ordered' → 'received' → or 'cancelled'. In draft status you can edit, add, and delete items. After converting to 'ordered', no further edits are allowed. The total is calculated automatically from the items.",
+          "tip": "You can freely edit a purchase order before converting it to 'ordered'. After that, no edits — only receiving or cancelling.",
+          "info": "A purchase order defines the supplier, quantities, and prices. Upon receiving, a batch is created for each item with a batch number and expiry date (if applicable)."
         },
         "6": {
-          "title": "Selling and Dispensing (Outbound)",
-          "description": "Selling happens through invoices: when you create an invoice with an item linked to a product variant, stock is deducted automatically (FIFO/FEFO). Consumables are also auto-deducted in examinations based on consumable rules.",
-          "tip": "Add consumable rules in the 'Exam Consumables' tab to auto-deduct drops and papers on each examination."
+          "title": "Receive Purchase Order (Inbound)",
+          "description": "When goods arrive, click 'Receive' on a purchase order with 'ordered' status. This will automatically: (1) create a batch for each item with batch number and expiry date, (2) generate an inbound stock movement (in) with reason 'purchase', (3) update the variant's stock quantity, (4) update the supplier account (increase payable). You can receive less than ordered (partial receipt) — the order stays open for the remaining items. Status changes to 'received'.",
+          "tip": "Verify that received quantities match the actual invoice. Enter expiry dates for drops and contact lenses to enable expiry alerts.",
+          "warning": "Receiving a purchase order cannot be undone. Review quantities and costs before confirming."
         },
         "7": {
-          "title": "Handle Damage and Expiry",
-          "description": "When an item is damaged or expired, record an outbound movement via 'Record Damage' or 'Record Expiry'. The quantity will be deducted from stock and the cost recorded as a loss in profit/loss reports.",
-          "tip": "Review stock alerts regularly — the system alerts you about products expiring within 30 days."
+          "title": "Purchase Order Returns",
+          "description": "If you receive defective or incorrect goods, you can record a return to the supplier. This is done by recording an outbound movement (out) with reason 'return' in the 'Stock Movements' tab — select the variant, quantity, and batch to return. The quantity will be deducted from stock and the supplier account updated (reduce payable).",
+          "tip": "Record returns immediately upon discovering defects to keep stock value accurate. Write a note explaining the return reason.",
+          "info": "A return generates an outbound movement with reason 'return' and does not affect the original batch — it only deducts the quantity."
         },
         "8": {
+          "title": "Selling and Dispensing (Outbound)",
+          "description": "Selling happens through invoices on the 'Invoices' page. When you create an invoice with an item linked to a product variant, stock is deducted automatically based on the costing method (FEFO/FIFO/average). Invoices go through statuses: unpaid → paid / partially-paid → or cancelled. Consumables are also auto-deducted during examinations based on defined consumable rules. Each sale generates an outbound movement (out) with reason 'sale'.",
+          "tip": "Ensure invoice items are correctly linked to product variants for automatic stock deduction.",
+          "warning": "If stock is insufficient, an alert will appear and the invoice cannot be completed. Review low stock alerts regularly."
+        },
+        "9": {
+          "title": "Exam Consumables",
+          "description": "In the 'Exam Consumables' tab, define rules that link exam types to product variants. For example: a refraction exam consumes 1 drop + 1 cover paper. When an exam is completed on the Examinations page, consumables are automatically deducted from stock and an outbound movement (out) is generated with reason 'dispensing'. This ensures stock accuracy without manual intervention. Each rule specifies: exam type, product variant, and quantity consumed per exam.",
+          "tip": "Add consumable rules for all exam types that use drops, papers, or trial contact lenses. This ensures stock is deducted automatically on each exam.",
+          "info": "If no consumable rule is defined for an exam type, no consumables will be deducted when completing that exam."
+        },
+        "10": {
+          "title": "Handle Damage and Expiry",
+          "description": "When an item is damaged or expired, record an outbound movement from the 'Stock Movements' tab: 'Record Damage' for damaged items, or record expiry for expired ones. Select the variant, quantity, and batch (if applicable). The quantity will be deducted from stock and the cost recorded as a loss in profit/loss reports. The movement is recorded as outbound (out) with reason 'damage' or 'expiry'. You can also record a 'recall' for items recalled by the manufacturer.",
+          "tip": "Review stock alerts regularly — the system alerts you about products expiring within 30 days. Record damage immediately upon discovery to keep stock value accurate.",
+          "warning": "Ignoring expired items leads to selling expired products and inaccurate stock value. Record expiry immediately."
+        },
+        "11": {
+          "title": "Stock Alerts & Adjustments",
+          "description": "In the 'Stock Movements' tab you'll find stat cards: total stock value, low stock count (below minimum), out of stock (zero), expiring soon (within 30 days), and expired. The system generates automatic notifications for alerts. You can also record a manual adjustment (adjust) via the 'Adjust Stock' button to correct discrepancies without a full stocktake — select the variant, new quantity, and adjustment reason.",
+          "tip": "Set an appropriate minimum quantity (minQuantity) for each variant so the system alerts you before stock runs out. The minimum determines when a product appears in the 'low stock' alert.",
+          "warning": "Manual adjustments affect stock value. Use them only for small discrepancy corrections and write a clear note explaining the reason."
+        },
+        "12": {
           "title": "Periodic Stocktaking & Reports",
-          "description": "Perform periodic physical stocktaking via the 'Stocktaking' tab: start a session, count actual quantities, then complete to auto-adjust differences. Review inventory reports (stock value, profit/loss, stock movements) in the Reports page.",
-          "tip": "Conduct stocktaking at least monthly. Stocktaking generates adjustment movements automatically for discrepancies."
+          "description": "In the 'Stocktaking' tab, start a periodic stocktake session: the system will pull all variants and their system quantities. Count the actual quantities in the clinic and enter them in the 'Counted Quantity' column. The difference is calculated automatically. On completing the stocktake, the system generates adjustment movements (adjust) automatically for discrepancies — increases or decreases. Review inventory reports on the 'Reports' page: stock value, profit/loss, stock movements, top-selling items. Stocktake statuses: draft → in_progress → completed or cancelled.",
+          "tip": "Conduct stocktaking at least monthly. Stocktaking generates adjustment movements automatically for discrepancies. Start stocktaking when there are no sales to ensure counting accuracy.",
+          "info": "You can cancel a stocktake at any time before completion — all counted quantities will be discarded. After completion, it cannot be undone."
         }
       }
     }

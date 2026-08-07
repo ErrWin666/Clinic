@@ -1,6 +1,6 @@
 {
   "name": "clinic-eye-app",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Clinic Eye Examination Management Desktop App",
   "main": "main.js",
   "scripts": {

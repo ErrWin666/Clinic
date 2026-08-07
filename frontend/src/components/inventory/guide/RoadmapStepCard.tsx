@@ -14,6 +14,11 @@ import { IconBadge, type IconBadgeVariant } from "@/components/common/IconBadge"
 import { RoadmapTip } from "./RoadmapTip";
 import { cn } from "@/lib/utils";
 
+export interface RoadmapTipItem {
+  variant: "info" | "warning" | "success";
+  text: string;
+}
+
 export interface RoadmapStep {
   number: number;
   icon: LucideIcon;
@@ -106,11 +111,25 @@ export function RoadmapStepCard({
             {t(`inventory.guide.steps.${stepKey}.description`)}
           </p>
 
-          {/* Tip */}
-          <RoadmapTip
-            variant="success"
-            text={t(`inventory.guide.steps.${stepKey}.tip`)}
-          />
+          {/* Tips */}
+          <div className="flex flex-col gap-2">
+            <RoadmapTip
+              variant="success"
+              text={t(`inventory.guide.steps.${stepKey}.tip`)}
+            />
+            {t(`inventory.guide.steps.${stepKey}.warning`, { defaultValue: "" }) && (
+              <RoadmapTip
+                variant="warning"
+                text={t(`inventory.guide.steps.${stepKey}.warning`)}
+              />
+            )}
+            {t(`inventory.guide.steps.${stepKey}.info`, { defaultValue: "" }) && (
+              <RoadmapTip
+                variant="info"
+                text={t(`inventory.guide.steps.${stepKey}.info`)}
+              />
+            )}
+          </div>
 
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-2 pt-1">

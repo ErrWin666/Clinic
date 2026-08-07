@@ -13,6 +13,10 @@ import {
   BookOpenIcon,
   ArrowRightIcon,
   SparklesIcon,
+  Layers,
+  PackageSearch,
+  AlertTriangleIcon,
+  RotateCcwIcon,
 } from "lucide-react";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -26,13 +30,17 @@ const STORAGE_KEY = "inventory_guide_progress";
 
 const STEPS: RoadmapStep[] = [
   { number: 1, icon: Package, route: "/inventory", routeLabel: "products" },
-  { number: 2, icon: Truck, route: "/suppliers", routeLabel: "suppliers" },
-  { number: 3, icon: Boxes, route: "/inventory", routeLabel: "movements" },
-  { number: 4, icon: ShoppingCart, route: "/purchase-orders", routeLabel: "purchaseOrders" },
-  { number: 5, icon: PackageCheck, route: "/purchase-orders", routeLabel: "purchaseOrders" },
-  { number: 6, icon: Receipt, route: "/invoices", routeLabel: "invoices" },
-  { number: 7, icon: TrendingDown, route: "/inventory", routeLabel: "movements" },
-  { number: 8, icon: ClipboardCheck, route: "/inventory", routeLabel: "stocktaking" },
+  { number: 2, icon: Layers, route: "/inventory", routeLabel: "products" },
+  { number: 3, icon: Truck, route: "/suppliers", routeLabel: "suppliers" },
+  { number: 4, icon: Boxes, route: "/inventory", routeLabel: "movements" },
+  { number: 5, icon: ShoppingCart, route: "/purchase-orders", routeLabel: "purchaseOrders" },
+  { number: 6, icon: PackageCheck, route: "/purchase-orders", routeLabel: "purchaseOrders" },
+  { number: 7, icon: RotateCcwIcon, route: "/purchase-orders", routeLabel: "purchaseOrders" },
+  { number: 8, icon: Receipt, route: "/invoices", routeLabel: "invoices" },
+  { number: 9, icon: PackageSearch, route: "/inventory", routeLabel: "consumables" },
+  { number: 10, icon: TrendingDown, route: "/inventory", routeLabel: "movements" },
+  { number: 11, icon: AlertTriangleIcon, route: "/inventory", routeLabel: "movements" },
+  { number: 12, icon: ClipboardCheck, route: "/inventory", routeLabel: "stocktaking" },
 ];
 
 interface GuideProgress {
