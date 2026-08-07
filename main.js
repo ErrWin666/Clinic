@@ -226,7 +226,7 @@ function createMainWindow(backendPort) {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
-      backgroundThrottling: true,
+      backgroundThrottling: false,
       spellcheck: false,
       devTools: true,
     },

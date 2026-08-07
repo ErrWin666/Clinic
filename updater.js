@@ -18,13 +18,6 @@ function initUpdater(mainWindow) {
   autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = true;
 
-  // Public repo — no token needed, electron-updater reads from electron-builder.yml
-  autoUpdater.setFeedURL({
-    provider: "github",
-    owner: "ErrWin666",
-    repo: "Clinic",
-  });
-
   autoUpdater.on("checking-for-update", () => {
     log.info("Checking for updates...");
   });
