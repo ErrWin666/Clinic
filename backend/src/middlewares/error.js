@@ -19,7 +19,8 @@ function errorHandler(err, req, res, next) {
 }
 
 function notFoundHandler(req, res) {
-  return res.status(404).json(ApiResponse.error("NOT_FOUND", `Route ${req.method} ${req.path} not found`));
+  const message = config.server.isDev ? `Route ${req.method} ${req.path} not found` : "Resource not found";
+  return res.status(404).json(ApiResponse.error("NOT_FOUND", message));
 }
 
 module.exports = { errorHandler, notFoundHandler };

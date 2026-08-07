@@ -51,7 +51,10 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (errorCode === "UNAUTHORIZED") {
+    const requestUrl = originalRequest?.url || "";
+    const isAuthEndpoint = requestUrl.includes("/auth/login") || requestUrl.includes("/auth/recover") || requestUrl.includes("/auth/recover-via-file");
+
+    if (errorCode === "UNAUTHORIZED" && !isAuthEndpoint) {
       window.dispatchEvent(new CustomEvent("auth:session-expired"));
       return Promise.reject(error);
     }

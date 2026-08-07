@@ -61,12 +61,8 @@ class AuthController extends BaseController {
 
   async sessionStatus(req, res, next) {
     try {
-      const userId = req.cookies.userId;
-      if (!userId) {
-        throw new CustomError(MESSAGES.COMMON.UNAUTHORIZED, "UNAUTHORIZED", 401);
-      }
-
-      const user = await this.authService.getSessionStatus(parseInt(userId, 10));
+      const userId = req.user.id;
+      const user = await this.authService.getSessionStatus(userId);
       return this.sendSuccess(res, { user }, MESSAGES.AUTH.SESSION_ACTIVE);
     } catch (error) {
       next(error);
@@ -119,10 +115,7 @@ class AuthController extends BaseController {
 
   async regenerateRecoveryCode(req, res, next) {
     try {
-      const userId = parseInt(req.cookies.userId, 10);
-      if (!userId) {
-        throw new CustomError(MESSAGES.COMMON.UNAUTHORIZED, "UNAUTHORIZED", 401);
-      }
+      const userId = req.user.id;
       const result = await this.authService.regenerateRecoveryCode(userId);
       return this.sendSuccess(res, result, MESSAGES.AUTH.RECOVERY_CODE_REGENERATED);
     } catch (error) {

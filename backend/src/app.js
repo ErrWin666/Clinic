@@ -16,6 +16,7 @@ const logger = require("./utils/logger");
 
 const app = express();
 
+app.disable("x-powered-by");
 app.set("trust proxy", config.server.trustProxy);
 
 for (const warning of config.warnings) {

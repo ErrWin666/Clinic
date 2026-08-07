@@ -14,6 +14,10 @@ const PERMISSIONS = {
     "inventory:read",
     "inventory:dispense",
     "notes:read", "notes:write",
+    "settings:read",
+    "backup:read",
+    "system:read",
+    "audit:read",
   ],
   receptionist: [
     "patients:read", "patients:write",
@@ -26,6 +30,8 @@ const PERMISSIONS = {
     "inventory:purchase",
     "inventory:finance",
     "notes:read", "notes:write",
+    "settings:read",
+    "system:read",
   ],
   viewer: [
     "patients:read",
@@ -37,6 +43,8 @@ const PERMISSIONS = {
     "reports:read",
     "inventory:read",
     "notes:read",
+    "settings:read",
+    "audit:read",
   ],
 };
 

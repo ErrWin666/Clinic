@@ -12,8 +12,14 @@ export function useApiError() {
     (error: unknown) => {
       const axiosError = error as AxiosError<ApiResponse<unknown>>;
       const code = axiosError?.response?.data?.error?.code;
+      const backendMessage = axiosError?.response?.data?.error?.message;
       const i18nKey = getErrorI18nKey(code);
-      toast.error(t(i18nKey));
+      const translated = t(i18nKey);
+      if (code === "VALIDATION_ERROR" && backendMessage && backendMessage !== translated) {
+        toast.error(backendMessage);
+      } else {
+        toast.error(translated);
+      }
     },
     [t]
   );

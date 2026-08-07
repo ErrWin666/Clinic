@@ -5,7 +5,7 @@ const config = require("./index");
 // Vite dev server otherwise).
 function resolveCorsOrigin() {
   const raw = config.server.corsOrigin;
-  if (!raw) return config.server.isDev ? true : true;
+  if (!raw) return config.server.isDev ? true : false;
   if (raw.trim() === "*") return true;
   const origins = raw.split(",").map((o) => o.trim()).filter(Boolean);
   return origins.length === 1 ? origins[0] : origins;
@@ -25,7 +25,6 @@ module.exports = {
     message: {
       success: false,
       error: { code: "TOO_MANY_REQUESTS", message: "Too many login attempts, try again later" },
-      message: "Rate limit exceeded",
     },
   },
 };

@@ -19,7 +19,7 @@ describe("AuthController", () => {
       cookie: jest.fn().mockReturnThis(),
       clearCookie: jest.fn().mockReturnThis(),
     };
-    req = { body: {}, cookies: {} };
+    req = { body: {}, cookies: {}, user: { id: 1, role: "admin" } };
   });
 
   describe("login", () => {
@@ -78,15 +78,7 @@ describe("AuthController", () => {
   });
 
   describe("sessionStatus", () => {
-    it("should call next with CustomError if no userId cookie", async () => {
-      req.cookies = {};
-      await controller.sessionStatus(req, res, next);
-      expect(next).toHaveBeenCalledWith(expect.any(CustomError));
-      expect(next.mock.calls[0][0].statusCode).toBe(401);
-    });
-
     it("should return user session", async () => {
-      req.cookies = { userId: "1" };
       jest.spyOn(controller.authService, "getSessionStatus").mockResolvedValue({ id: 1, username: "admin" });
       await controller.sessionStatus(req, res, next);
       expect(res.status).toHaveBeenCalledWith(200);
@@ -94,7 +86,6 @@ describe("AuthController", () => {
     });
 
     it("should call next on error", async () => {
-      req.cookies = { userId: "1" };
       jest.spyOn(controller.authService, "getSessionStatus").mockRejectedValue(new Error("fail"));
       await controller.sessionStatus(req, res, next);
       expect(next).toHaveBeenCalledWith(expect.any(Error));
@@ -161,21 +152,12 @@ describe("AuthController", () => {
 
   describe("regenerateRecoveryCode", () => {
     it("should regenerate recovery code successfully", async () => {
-      req.cookies = { userId: "1" };
       jest.spyOn(controller.authService, "regenerateRecoveryCode").mockResolvedValue({ recoveryCode: "123456" });
       await controller.regenerateRecoveryCode(req, res, next);
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
-    it("should call next with CustomError when no userId", async () => {
-      req.cookies = {};
-      await controller.regenerateRecoveryCode(req, res, next);
-      expect(next).toHaveBeenCalledWith(expect.any(CustomError));
-      expect(next.mock.calls[0][0].statusCode).toBe(401);
-    });
-
     it("should call next on regenerate error", async () => {
-      req.cookies = { userId: "1" };
       jest.spyOn(controller.authService, "regenerateRecoveryCode").mockRejectedValue(new Error("Regen fail"));
       await controller.regenerateRecoveryCode(req, res, next);
       expect(next).toHaveBeenCalledWith(expect.any(Error));
