@@ -143,7 +143,7 @@ async function bootSequence() {
     const port = getBackendPort();
 
     // 4. Wait for server health
-    await waitForServerHealth(port, 30000);
+    await waitForServerHealth(port, 90000);
 
     // 5. Create main window
     mainWindow = createMainWindow(port);
@@ -271,6 +271,11 @@ function showErrorScreen(message, showResetButton = false) {
     center: true,
     title: "Error",
     show: true,
+    webPreferences: {
+      contextIsolation: false,
+      nodeIntegration: true,
+      sandbox: false,
+    },
   });
 
   errorWindow.loadFile(path.join(__dirname, "error-screen.html"));
@@ -428,7 +433,7 @@ ipcMain.handle("change-data-path", async (event, newPath, moveData) => {
       log.error("Migration failed, restarting backend with old config");
       if (currentBackendEnv) {
         backendProcess = await startBackend(currentBackendEnv, __dirname);
-        await waitForServerHealth(getBackendPort(), 30000);
+        await waitForServerHealth(getBackendPort(), 90000);
       }
       return result;
     }
@@ -448,7 +453,7 @@ ipcMain.handle("change-data-path", async (event, newPath, moveData) => {
     };
     currentBackendEnv = newBackendEnv;
     backendProcess = await startBackend(newBackendEnv, __dirname);
-    await waitForServerHealth(getBackendPort(), 30000);
+    await waitForServerHealth(getBackendPort(), 90000);
 
     // Clean up old data
     try {
