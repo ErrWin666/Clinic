@@ -42,6 +42,23 @@ jobs:
       - name: Prune backend deps for production
         run: npm run build:backend
 
+      - name: Delete existing release if present
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          Write-Host "Checking for existing release on tag $tag"
+          $headers = @{ Authorization = "Bearer $env:GH_TOKEN"; Accept = "application/vnd.github+json" }
+          try {
+            $resp = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases/tags/$tag" -Headers $headers -ErrorAction Stop
+            Write-Host "Found release ID $($resp.id) — deleting it"
+            Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases/$($resp.id)" -Method Delete -Headers $headers
+            Write-Host "Release deleted successfully"
+          } catch {
+            Write-Host "No existing release found (or already deleted) — continuing"
+          }
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build Windows installer and publish
         run: npx electron-builder --win --publish always
         env:
