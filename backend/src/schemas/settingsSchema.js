@@ -20,7 +20,6 @@ const updateAdminSchema = Joi.object({
     username: Joi.string().min(3).max(50),
     currentPassword: Joi.string().required(),
     newPassword: Joi.string().min(6).max(100),
-    isAdmin: Joi.boolean(),
   }).min(2),
   query: Joi.object({}),
   params: Joi.object({}),

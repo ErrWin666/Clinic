@@ -1,13 +1,14 @@
 const { Settings } = require("../models");
 const logger = require("../utils/logger");
 const MessageTemplateService = require("./messaging");
+const { maskSecrets } = require("../utils/maskSecrets");
 
 class WhatsAppService {
   constructor() {
     this.templates = new MessageTemplateService();
   }
 
-  async getSettings() {
+  async _getRawSettings() {
     const rows = await Settings.findAll({ where: { category: "whatsapp" } });
     const settings = {};
     for (const row of rows) {
@@ -19,6 +20,10 @@ class WhatsAppService {
       }
     }
     return settings;
+  }
+
+  async getSettings() {
+    return maskSecrets(await this._getRawSettings());
   }
 
   async updateSettings(updates) {
@@ -36,7 +41,7 @@ class WhatsAppService {
   }
 
   async sendMessage(to, message) {
-    const settings = await this.getSettings();
+    const settings = await this._getRawSettings();
     if (!settings.enabled) {
       logger.info("WhatsApp/SMS disabled, skipping message");
       return { success: false, reason: "disabled" };
@@ -91,7 +96,7 @@ class WhatsAppService {
       return { success: false, reason: "no_phone" };
     }
 
-    const settings = await this.getSettings();
+    const settings = await this._getRawSettings();
     const clinicInfo = await this.templates.getClinicInfo();
     // Use custom template from Settings if set, otherwise use centralized template
     if (settings.appointmentTemplate) {
@@ -114,7 +119,7 @@ class WhatsAppService {
       return { success: false, reason: "no_phone" };
     }
 
-    const settings = await this.getSettings();
+    const settings = await this._getRawSettings();
     const clinicInfo = await this.templates.getClinicInfo();
     if (settings.invoiceTemplate) {
       const message = settings.invoiceTemplate
@@ -136,7 +141,7 @@ class WhatsAppService {
       return { success: false, reason: "no_phone" };
     }
 
-    const settings = await this.getSettings();
+    const settings = await this._getRawSettings();
     const clinicInfo = await this.templates.getClinicInfo();
     if (settings.followUpTemplate) {
       const message = settings.followUpTemplate

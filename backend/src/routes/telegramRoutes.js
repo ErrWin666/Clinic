@@ -1,11 +1,13 @@
 const express = require("express");
 const router = express.Router();
+const crypto = require("crypto");
 const TelegramController = require("../controllers/TelegramController");
 const auth = require("../middlewares/auth");
 const { requirePermission } = require("../middlewares/rbac");
 const { validate } = require("../middlewares/validate");
 const audit = require("../middlewares/audit");
 const Joi = require("joi");
+const config = require("../config");
 
 const controller = new TelegramController();
 
@@ -27,6 +29,12 @@ const testSchema = Joi.object({
   params: Joi.object({}),
 });
 
+const webhookSchema = Joi.object({
+  body: Joi.object().unknown(true),
+  query: Joi.object({}),
+  params: Joi.object({}),
+});
+
 const patientIdParamSchema = Joi.object({
   body: Joi.object({}),
   query: Joi.object({}),
@@ -35,8 +43,27 @@ const patientIdParamSchema = Joi.object({
   }),
 });
 
-// Webhook is public (Telegram sends updates to it)
-router.post("/webhook", validate(testSchema), (req, res, next) => controller.handleWebhook(req, res, next));
+function webhookSecretCheck(req, res, next) {
+  const secret = config.telegram.webhookSecret;
+  if (!secret) {
+    return res.status(503).json({
+      success: false,
+      error: { code: "WEBHOOK_NOT_CONFIGURED", message: "Webhook secret not set" },
+    });
+  }
+  const received = Buffer.from(req.headers["x-telegram-bot-api-secret-token"] || "");
+  const expected = Buffer.from(secret);
+  if (received.length !== expected.length || !crypto.timingSafeEqual(received, expected)) {
+    return res.status(403).json({
+      success: false,
+      error: { code: "WEBHOOK_FORBIDDEN", message: "Invalid webhook secret" },
+    });
+  }
+  next();
+}
+
+// Webhook is public (Telegram sends updates to it) but protected by secret token
+router.post("/webhook", webhookSecretCheck, validate(webhookSchema), (req, res, next) => controller.handleWebhook(req, res, next));
 
 // All other routes require auth
 router.use(auth);

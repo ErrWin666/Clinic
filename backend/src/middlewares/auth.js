@@ -14,7 +14,7 @@ async function authMiddleware(req, res, next) {
 
     let decoded;
     try {
-      decoded = jwt.verify(token, authConfig.jwtSecret);
+      decoded = jwt.verify(token, authConfig.jwtSecret, { algorithms: ["HS256"] });
     } catch (err) {
       if (err.name === "TokenExpiredError") {
         throw new CustomError(MESSAGES.AUTH.TOKEN_EXPIRED, "TOKEN_EXPIRED", 401);

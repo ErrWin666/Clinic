@@ -45,7 +45,11 @@ class SettingsService extends BaseService {
 
   async updateAdmin(data, userId) {
     return this.executeOperation(async () => {
-      const user = await this.userRepository.findById(userId);
+      const User = require("../models").User;
+      const user = await User.scope("withSecrets").findByPk(userId);
+      if (!user) {
+        throw new CustomError(MESSAGES.COMMON.NOT_FOUND, "NOT_FOUND", 404);
+      }
 
       const isMatch = await user.comparePassword(data.currentPassword);
       if (!isMatch) {

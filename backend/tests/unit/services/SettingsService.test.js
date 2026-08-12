@@ -100,7 +100,7 @@ describe("SettingsService", () => {
         adminUser.id
       );
 
-      const user = await User.findByPk(adminUser.id);
+      const user = await User.scope("withSecrets").findByPk(adminUser.id);
       const isMatch = await user.comparePassword("NewPass@123");
       expect(isMatch).toBe(true);
     });
@@ -111,7 +111,7 @@ describe("SettingsService", () => {
         adminUser.id
       );
       expect(result.username).toBe("bothupdated");
-      const user = await User.findByPk(adminUser.id);
+      const user = await User.scope("withSecrets").findByPk(adminUser.id);
       expect(await user.comparePassword("BothPass@123")).toBe(true);
     });
   });

@@ -39,7 +39,7 @@ class AuthService extends BaseService {
     return this.executeOperation(async () => {
       let decoded;
       try {
-        decoded = jwt.verify(refreshToken, authConfig.jwtRefreshSecret);
+        decoded = jwt.verify(refreshToken, authConfig.jwtRefreshSecret, { algorithms: ["HS256"] });
       } catch (err) {
         throw new CustomError(MESSAGES.AUTH.SESSION_EXPIRED, "SESSION_EXPIRED", 401);
       }
@@ -76,7 +76,7 @@ class AuthService extends BaseService {
   async logout(refreshToken) {
     if (!refreshToken) return;
     try {
-      const decoded = jwt.verify(refreshToken, authConfig.jwtRefreshSecret);
+      const decoded = jwt.verify(refreshToken, authConfig.jwtRefreshSecret, { algorithms: ["HS256"] });
       if (decoded.jti) {
         await this.revokeToken(decoded.jti, decoded.userId, decoded.exp);
       }
@@ -101,7 +101,7 @@ class AuthService extends BaseService {
     return this.executeOperation(async () => {
       const user = await this.repository.findByUsername(username);
       if (!user) {
-        throw new CustomError(MESSAGES.AUTH.RECOVERY_USER_NOT_FOUND, "USER_NOT_FOUND", 404);
+        throw new CustomError(MESSAGES.AUTH.RECOVERY_INVALID_CODE, "INVALID_RECOVERY_CODE", 400);
       }
 
       const valid = await this.recoveryService.verifyRecoveryCode(recoveryCode, user.recoveryCodeHash);
@@ -135,7 +135,7 @@ class AuthService extends BaseService {
     return this.executeOperation(async () => {
       const user = await this.repository.findByUsername(username);
       if (!user) {
-        throw new CustomError(MESSAGES.AUTH.RECOVERY_USER_NOT_FOUND, "USER_NOT_FOUND", 404);
+        throw new CustomError(MESSAGES.AUTH.RECOVERY_FILE_INVALID, "RECOVERY_FILE_INVALID", 500);
       }
 
       const token = await this.recoveryService.readTokenFile();

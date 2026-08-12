@@ -12,6 +12,7 @@ const auth = require("./middlewares/auth");
 const uploadAuth = require("./middlewares/uploadAuth");
 const { apiLimiter } = require("./middlewares/rateLimit");
 const sanitizeInput = require("./middlewares/sanitize");
+const csrfCheck = require("./middlewares/csrf");
 const logger = require("./utils/logger");
 
 const app = express();
@@ -50,7 +51,7 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-app.use("/api", apiLimiter, sanitizeInput, routes);
+app.use("/api", apiLimiter, sanitizeInput, csrfCheck, routes);
 
 app.use("/uploads", auth, uploadAuth, express.static(config.upload.dir));
 

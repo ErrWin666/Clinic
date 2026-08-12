@@ -22,6 +22,14 @@ const User = sequelize.define(
   {
     tableName: "users",
     paranoid: true,
+    defaultScope: {
+      attributes: { exclude: ["password", "recoveryCodeHash"] },
+    },
+    scopes: {
+      withSecrets: {
+        attributes: { include: ["password", "recoveryCodeHash"] },
+      },
+    },
     hooks: {
       beforeCreate: async (user) => {
         if (user.password) {

@@ -1,14 +1,41 @@
 const { AuditLog } = require("../models");
 const logger = require("../utils/logger");
 
-const SENSITIVE_FIELDS = ["password", "currentPassword", "newPassword", "confirmPassword"];
+const SENSITIVE_FIELDS = [
+  "password",
+  "currentPassword",
+  "newPassword",
+  "confirmPassword",
+  "token",
+  "secret",
+  "apiKey",
+  "botToken",
+  "accessToken",
+  "clientSecret",
+  "apiSecret",
+];
+
+const SENSITIVE_PATTERNS = [/token/i, /secret/i, /password/i, /apikey/i];
+
+function isSensitiveKey(key) {
+  if (SENSITIVE_FIELDS.includes(key)) return true;
+  return SENSITIVE_PATTERNS.some((pattern) => pattern.test(key));
+}
 
 function sanitizeBody(body) {
   const sanitized = { ...body };
-  for (const field of SENSITIVE_FIELDS) {
-    if (field in sanitized) {
+  for (const field of Object.keys(sanitized)) {
+    if (isSensitiveKey(field)) {
       sanitized[field] = "[REDACTED]";
     }
+  }
+  if (Array.isArray(sanitized.settings)) {
+    sanitized.settings = sanitized.settings.map((item) => {
+      if (item && typeof item.key === "string" && isSensitiveKey(item.key)) {
+        return { ...item, value: "[REDACTED]" };
+      }
+      return item;
+    });
   }
   return sanitized;
 }

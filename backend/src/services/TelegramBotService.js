@@ -3,6 +3,7 @@ const { Settings, Patient } = require("../models");
 const config = require("../config");
 const logger = require("../utils/logger");
 const MESSAGES = require("../constants/messages");
+const { maskSecrets } = require("../utils/maskSecrets");
 
 /**
  * TelegramBotService — Layer 2 of the message cascade.
@@ -15,7 +16,7 @@ class TelegramBotService {
     this._abortController = null;
   }
 
-  async getSettings() {
+  async _getRawSettings() {
     const rows = await Settings.findAll({ where: { category: "telegram" } });
     const settings = {};
     for (const row of rows) {
@@ -27,6 +28,10 @@ class TelegramBotService {
       }
     }
     return settings;
+  }
+
+  async getSettings() {
+    return maskSecrets(await this._getRawSettings());
   }
 
   async updateSettings(updates) {

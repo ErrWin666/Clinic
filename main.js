@@ -225,10 +225,10 @@ function createMainWindow(backendPort) {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false,
+      sandbox: true,
       backgroundThrottling: false,
       spellcheck: false,
-      devTools: true,
+      devTools: isDev,
     },
   });
 
@@ -338,7 +338,13 @@ ipcMain.handle("create-backup", async () => {
 ipcMain.handle("restore-backup", async (event, filePath) => {
   const userDataPath = app.getPath("userData");
   const dbPath = path.join(userDataPath, "database.sqlite");
-  return restoreBackup(filePath, dbPath);
+  const backupsDir = path.resolve(userDataPath, "backups");
+  const resolvedBackup = path.resolve(filePath);
+  if (!resolvedBackup.startsWith(backupsDir)) {
+    log.warn(`restore-backup blocked: path "${resolvedBackup}" is outside backups directory`);
+    return false;
+  }
+  return restoreBackup(resolvedBackup, dbPath);
 });
 
 ipcMain.handle("collect-logs", async () => {
@@ -370,8 +376,14 @@ ipcMain.handle("select-folder", async () => {
 ipcMain.handle("open-folder", async (event, folderPath) => {
   const userDataPath = app.getPath("userData");
   const targetPath = folderPath || userDataPath;
-  if (fs.existsSync(targetPath)) {
-    shell.openPath(targetPath);
+  const resolvedTarget = path.resolve(targetPath);
+  const resolvedUserData = path.resolve(userDataPath);
+  if (!resolvedTarget.startsWith(resolvedUserData) && resolvedTarget !== resolvedUserData) {
+    log.warn(`open-folder blocked: path "${resolvedTarget}" is outside userData`);
+    return false;
+  }
+  if (fs.existsSync(resolvedTarget)) {
+    shell.openPath(resolvedTarget);
     return true;
   }
   return false;
@@ -387,6 +399,15 @@ ipcMain.handle("validate-data-path", async (event, dirPath) => {
 });
 
 ipcMain.handle("change-data-path", async (event, newPath, moveData) => {
+  if (!newPath || typeof newPath !== "string") {
+    return { success: false, error: "Invalid path" };
+  }
+
+  const validation = validateDataPath(newPath);
+  if (!validation.valid) {
+    return { success: false, error: validation.error };
+  }
+
   const currentPath = app.getPath("userData");
 
   if (moveData) {

@@ -33,7 +33,6 @@ describe("AuthController", () => {
       await controller.login(req, res, next);
       expect(res.cookie).toHaveBeenCalledWith("accessToken", "access-token", expect.any(Object));
       expect(res.cookie).toHaveBeenCalledWith("refreshToken", "refresh-token", expect.any(Object));
-      expect(res.cookie).toHaveBeenCalledWith("userId", "1", expect.any(Object));
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
@@ -72,7 +71,6 @@ describe("AuthController", () => {
       await controller.refreshToken(req, res, next);
       expect(res.clearCookie).toHaveBeenCalledWith("accessToken");
       expect(res.clearCookie).toHaveBeenCalledWith("refreshToken");
-      expect(res.clearCookie).toHaveBeenCalledWith("userId");
       expect(next).toHaveBeenCalledWith(expect.any(Error));
     });
   });
@@ -97,7 +95,6 @@ describe("AuthController", () => {
       await controller.logout(req, res, next);
       expect(res.clearCookie).toHaveBeenCalledWith("accessToken");
       expect(res.clearCookie).toHaveBeenCalledWith("refreshToken");
-      expect(res.clearCookie).toHaveBeenCalledWith("userId");
       expect(res.status).toHaveBeenCalledWith(200);
     });
 

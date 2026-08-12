@@ -93,6 +93,7 @@ const config = {
     apiBase: process.env.TELEGRAM_API_BASE || "https://api.telegram.org",
     pollingTimeout: parseInt(process.env.TELEGRAM_POLLING_TIMEOUT || "30", 10),
     pollingEnabled: process.env.TELEGRAM_POLLING_ENABLED !== "false",
+    webhookSecret: process.env.TELEGRAM_WEBHOOK_SECRET || "",
   },
   smsMobileApi: {
     url: process.env.SMS_MOBILE_API_URL || "",

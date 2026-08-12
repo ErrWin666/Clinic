@@ -2,6 +2,7 @@ const { Settings } = require("../models");
 const config = require("../config");
 const logger = require("../utils/logger");
 const MESSAGES = require("../constants/messages");
+const { maskSecrets } = require("../utils/maskSecrets");
 
 /**
  * SmsMobileApiService — Layer 3 of the message cascade.
@@ -13,7 +14,7 @@ const MESSAGES = require("../constants/messages");
  * to the next layer (Twilio).
  */
 class SmsMobileApiService {
-  async getSettings() {
+  async _getRawSettings() {
     const rows = await Settings.findAll({ where: { category: "sms_mobile_api" } });
     const settings = {};
     for (const row of rows) {
@@ -25,6 +26,10 @@ class SmsMobileApiService {
       }
     }
     return settings;
+  }
+
+  async getSettings() {
+    return maskSecrets(await this._getRawSettings());
   }
 
   async updateSettings(updates) {

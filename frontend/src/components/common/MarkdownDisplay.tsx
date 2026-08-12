@@ -16,8 +16,16 @@ interface MarkdownDisplayProps {
   className?: string;
 }
 
+function isSafeUrl(src: string): boolean {
+  const lower = src.toLowerCase();
+  if (lower.startsWith("javascript:") || lower.startsWith("vbscript:")) return false;
+  if (lower.startsWith("data:text/html") || lower.startsWith("data:image/svg")) return false;
+  return true;
+}
+
 function resolveUrl(src: string): string {
-  if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("data:")) {
+  if (!isSafeUrl(src)) return "#";
+  if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("data:image/")) {
     return src;
   }
   const uploadsUrl = getUploadsUrl();
@@ -130,9 +138,10 @@ export const MarkdownDisplay = memo(function MarkdownDisplay({
         if (href && isFileLink(href)) {
           return <FileLinkChip href={href} fileName={extractText(children) || "file"} />;
         }
+        const safeHref = href && isSafeUrl(href) ? href : "#";
         return (
           <a
-            href={href}
+            href={safeHref}
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary underline underline-offset-2 hover:text-primary/80"

@@ -7,11 +7,11 @@ class UserRepository extends BaseRepository {
   }
 
   async findByUsername(username) {
-    return this.model.findOne({ where: { username } });
+    return this.model.scope("withSecrets").findOne({ where: { username } });
   }
 
   async findAdmin() {
-    return this.model.findOne({ where: { role: "admin" } });
+    return this.model.scope("withSecrets").findOne({ where: { role: "admin" } });
   }
 }
 

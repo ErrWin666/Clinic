@@ -18,7 +18,6 @@ class AuthController extends BaseController {
 
       res.cookie("accessToken", result.accessToken, authConfig.cookieOptions);
       res.cookie("refreshToken", result.refreshToken, authConfig.cookieOptions);
-      res.cookie("userId", String(result.user.id), authConfig.cookieOptions);
 
       await Notification.findOrCreate({
         where: { type: "welcome", entityId: result.user.id, entityType: "User" },
@@ -54,7 +53,6 @@ class AuthController extends BaseController {
     } catch (error) {
       res.clearCookie("accessToken");
       res.clearCookie("refreshToken");
-      res.clearCookie("userId");
       next(error);
     }
   }
@@ -77,7 +75,6 @@ class AuthController extends BaseController {
       }
       res.clearCookie("accessToken");
       res.clearCookie("refreshToken");
-      res.clearCookie("userId");
       return this.sendSuccess(res, null, MESSAGES.AUTH.LOGOUT_SUCCESS);
     } catch (error) {
       next(error);

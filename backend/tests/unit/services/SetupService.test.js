@@ -35,7 +35,7 @@ describe("SetupService", () => {
       expect(admin.username).toBe("admin");
       expect(admin.role).toBe("admin");
 
-      const dbUser = await User.findByPk(admin.id);
+      const dbUser = await User.scope("withSecrets").findByPk(admin.id);
       expect(dbUser.password).not.toBe("Admin@123");
       const isMatch = await dbUser.comparePassword("Admin@123");
       expect(isMatch).toBe(true);
